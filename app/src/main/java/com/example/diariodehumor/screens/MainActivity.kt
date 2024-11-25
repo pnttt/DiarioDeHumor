@@ -1,6 +1,7 @@
 package com.example.diariodehumor.screens
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -36,99 +37,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun MoodTrackerScreen(viewModel: MoodViewModel) {
-    // Observa a lista de humores a partir do ViewModel
-    val moods by viewModel.allMoods.collectAsState(initial = emptyList())
 
-    var isAddingMood by remember { mutableStateOf(false) }
-    var selectedMood by remember { mutableStateOf("") }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Diário de Humor") },
-                backgroundColor = MaterialTheme.colors.primary
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { isAddingMood = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Adicionar Humor")
-            }
-        }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            // Lista de Humores
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                items(moods) { mood -> // moods já é do tipo List<Mood>
-                    Text("Humor: ${mood.mood}, Data: ${mood.date}", style = MaterialTheme.typography.body1)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-
-            // BottomSheet para Adicionar Humor
-            if (isAddingMood) {
-                AlertDialog(
-                    onDismissRequest = { isAddingMood = false },
-                    title = { Text("Adicionar Humor") },
-                    text = {
-                        Column {
-                            Text("Escolha o humor:")
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Row {
-                                Button(onClick = { selectedMood = "Feliz" }) {
-                                    Text("😊 Feliz")
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { selectedMood = "Triste" }) {
-                                    Text("😢 Triste")
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { selectedMood = "Neutro" }) {
-                                    Text("😐 Neutro")
-                                }
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                if (selectedMood.isNotEmpty()) {
-                                    viewModel.addMood(
-                                        Mood(
-                                            mood = selectedMood,
-                                            date = Date()
-                                        )
-                                    )
-                                    selectedMood = ""
-                                    isAddingMood = false
-                                }
-                            }
-                        ) {
-                            Text("Salvar")
-                        }
-                    },
-                    dismissButton = {
-                        Button(onClick = { isAddingMood = false }) {
-                            Text("Cancelar")
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
 
-
     NavHost(navController = navController, startDestination = "landing") {
         composable("landing") { LandingPage(navController) }
+        composable("moodTracker") { MoodTrackerScreen(navController) }
     }
 }

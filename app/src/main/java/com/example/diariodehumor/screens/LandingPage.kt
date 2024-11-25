@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.diariodehumor.model.Name
 import com.example.diariodehumor.viewmodel.MoodViewModel
 
 @Composable
@@ -24,10 +25,10 @@ fun LandingPage(navController: NavHostController) {
             label = { Text("Nome") }
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.navigate("mood_tracker") }) {
+        Button(onClick = { navController.navigate("moodTracker") }) {
             Text("Continuar")
         }
-        viewModel.userName(name)
+        viewModel.userName(Name(name = name))
 
     }
 

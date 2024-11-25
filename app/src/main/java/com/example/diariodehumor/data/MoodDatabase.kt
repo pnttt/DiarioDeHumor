@@ -6,11 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.diariodehumor.model.Mood
+import com.example.diariodehumor.model.Name
 
-@Database(entities = [Mood::class], version = 1, exportSchema = false)
+@Database(entities = [Mood::class, Name::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class) // Adicione esta anotação
 abstract class MoodDatabase : RoomDatabase() {
     abstract fun moodDao(): MoodDao
+    abstract fun nameDao(): nameDao
 
     companion object {
         @Volatile
@@ -22,7 +24,8 @@ abstract class MoodDatabase : RoomDatabase() {
                     context.applicationContext,
                     MoodDatabase::class.java,
                     "mood_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

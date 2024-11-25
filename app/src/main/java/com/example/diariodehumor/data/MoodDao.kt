@@ -12,11 +12,6 @@ interface MoodDao {
     @Query("SELECT * FROM mood_table ORDER BY date DESC")
     fun getAllMoods(): Flow<List<Mood>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertName(name: String)
-
-    @Query("SELECT 'name' FROM mood_table")
-    fun getName(): Flow<String>
 
     @Delete
     suspend fun deleteMood(mood: Mood)
