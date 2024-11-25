@@ -1,4 +1,4 @@
-package com.example.diariodehumor
+package com.example.diariodehumor.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,6 +17,10 @@ import com.example.diariodehumor.ui.theme.DiarioDeHumorTheme
 import com.example.diariodehumor.viewmodel.MoodViewModel
 import java.util.*
 import androidx.compose.foundation.lazy.items
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +30,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DiarioDeHumorTheme {
-                MoodTrackerScreen(viewModel)
+                AppNavigation()
             }
         }
     }
@@ -116,5 +120,15 @@ fun MoodTrackerScreen(viewModel: MoodViewModel) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun AppNavigation() {
+    val navController: NavHostController = rememberNavController()
+
+
+    NavHost(navController = navController, startDestination = "landing") {
+        composable("landing") { LandingPage(navController) }
     }
 }
