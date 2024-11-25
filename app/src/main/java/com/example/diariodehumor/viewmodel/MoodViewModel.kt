@@ -23,6 +23,16 @@ class MoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun userName(name: String) {
+        viewModelScope.launch {
+            moodDao.insertName(name)
+        }
+    }
+
+    fun getName(): Flow<String> {
+        return moodDao.getName()
+    }
+
     // Deletar um humor
     fun deleteMood(mood: Mood) {
         viewModelScope.launch {
