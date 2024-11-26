@@ -41,7 +41,6 @@ fun AppNavigation(viewModel: MoodViewModel) {
     LaunchedEffect(Unit) {
         if (!hasNavigated) {
             val name = viewModel.getLastRegisteredName()
-            Log.d("AppNavigation", "Último nome recuperado: $name")
 
 
             if (name.isEmpty()) {

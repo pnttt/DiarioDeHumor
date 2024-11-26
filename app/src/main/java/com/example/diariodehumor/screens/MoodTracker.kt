@@ -37,8 +37,6 @@ import java.util.Date
 
 @Composable
 fun MoodTrackerScreen(name: String, navController: NavHostController) {
-    // Log para verificar se o nome está sendo passado corretamente
-    Log.d("MoodTrackerScreen", "Nome recebido: $name")
 
     val viewModel: MoodViewModel = viewModel()
 

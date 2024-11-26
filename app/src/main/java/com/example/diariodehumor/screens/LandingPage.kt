@@ -1,6 +1,5 @@
 package com.example.diariodehumor.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -30,13 +29,8 @@ fun LandingPage(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            if (name.isNotEmpty()) {
-                Log.d("LandingPage", "Salvando nome: $name")
-                viewModel.userName(Name(name = name))
-                navController.navigate("moodTracker/$name")
-            } else {
-                Log.d("LandingPage", "Nome vazio, não navegando.")
-            }
+            viewModel.userName(Name(name = name))
+            navController.navigate("moodTracker/$name")
         }) {
             Text("Continuar")
         }

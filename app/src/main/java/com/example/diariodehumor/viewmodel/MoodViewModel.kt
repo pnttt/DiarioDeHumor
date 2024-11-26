@@ -29,12 +29,7 @@ class MoodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun userName(name: Name) {
         viewModelScope.launch {
-            if (name.name.isNotEmpty()) {
-                Log.d("MoodViewModel", "Salvando nome: ${name.name}")
-                nameDao.insertName(name)
-            } else {
-                Log.d("MoodViewModel", "Tentativa de salvar nome vazio ignorada.")
-            }
+            nameDao.insertName(name)
         }
     }
 
@@ -48,7 +43,6 @@ class MoodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isNameTableEmpty(): Flow<Boolean> {
         return nameDao.getName().map {
-            Log.d("MoodViewModel", "Nome recuperado no isNameTableEmpty: $it")
             it.isEmpty()
         }.catch { emit(true) }
     }
@@ -58,7 +52,6 @@ class MoodViewModel(application: Application) : AndroidViewModel(application) {
         val allNames = nameDao.getAllNames()
         val validNames = allNames.filter { it.name.isNotEmpty() }
         val lastName = validNames.lastOrNull()?.name ?: ""
-        Log.d("MoodViewModel", "Último nome válido recuperado: $lastName")
         return lastName
     }
 
@@ -66,7 +59,6 @@ class MoodViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun getAllSavedNames(): List<Name> {
         val names = nameDao.getAllNames()
-        Log.d("MoodViewModel", "Todos os nomes salvos: $names")
         return names
     }
 
