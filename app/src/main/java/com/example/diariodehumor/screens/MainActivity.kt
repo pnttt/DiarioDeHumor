@@ -5,23 +5,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.diariodehumor.model.Mood
 import com.example.diariodehumor.ui.theme.DiarioDeHumorTheme
 import com.example.diariodehumor.viewmodel.MoodViewModel
-import java.util.*
-import androidx.compose.foundation.lazy.items
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.diariodehumor.model.Name
+import kotlinx.coroutines.flow.firstOrNull
 
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DiarioDeHumorTheme {
-                AppNavigation()
+                AppNavigation(viewModel)
             }
         }
     }
@@ -40,11 +32,32 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(viewModel: MoodViewModel) {
     val navController: NavHostController = rememberNavController()
+
+
+    var hasNavigated by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!hasNavigated) {
+            val name = viewModel.getLastRegisteredName()
+            Log.d("AppNavigation", "Último nome recuperado: $name")
+
+
+            if (name.isEmpty()) {
+                navController.navigate("landing")
+            } else {
+                navController.navigate("moodTracker/$name")
+            }
+            hasNavigated = true
+        }
+    }
 
     NavHost(navController = navController, startDestination = "landing") {
         composable("landing") { LandingPage(navController) }
-        composable("moodTracker") { MoodTrackerScreen(navController) }
+        composable("moodTracker/{name}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            MoodTrackerScreen(name = name, navController = navController)
+        }
     }
 }

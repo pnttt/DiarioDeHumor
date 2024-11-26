@@ -9,10 +9,10 @@ import com.example.diariodehumor.model.Mood
 import com.example.diariodehumor.model.Name
 
 @Database(entities = [Mood::class, Name::class], version = 2, exportSchema = false)
-@TypeConverters(Converters::class) // Adicione esta anotação
+@TypeConverters(Converters::class)
 abstract class MoodDatabase : RoomDatabase() {
-    abstract fun moodDao(): MoodDao
     abstract fun nameDao(): nameDao
+    abstract fun moodDao(): MoodDao
 
     companion object {
         @Volatile
@@ -24,12 +24,13 @@ abstract class MoodDatabase : RoomDatabase() {
                     context.applicationContext,
                     MoodDatabase::class.java,
                     "mood_database"
-                ).fallbackToDestructiveMigration()
+                )
+                    // Comente a linha abaixo para evitar recriação do banco
+                    // .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
-
     }
 }

@@ -36,20 +36,21 @@ import com.example.diariodehumor.viewmodel.MoodViewModel
 import java.util.Date
 
 @Composable
-fun MoodTrackerScreen( navHost: NavHostController) {
+fun MoodTrackerScreen(name: String, navController: NavHostController) {
+    // Log para verificar se o nome está sendo passado corretamente
+    Log.d("MoodTrackerScreen", "Nome recebido: $name")
+
     val viewModel: MoodViewModel = viewModel()
-    // Observa a lista de humores a partir do ViewModel
+
     val moods by viewModel.allMoods.collectAsState(initial = emptyList())
 
-    val name by viewModel.name.collectAsState(initial = "")
-    Log.d("Name", name)
     var isAddingMood by remember { mutableStateOf(false) }
     var selectedMood by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Diário de Humor") },
+                title = { Text("Diário de Humor - $name") },
                 backgroundColor = MaterialTheme.colors.primary
             )
         },
@@ -66,7 +67,7 @@ fun MoodTrackerScreen( navHost: NavHostController) {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                items(moods) { mood -> // moods já é do tipo List<Mood>
+                items(moods) { mood ->
                     Text("Humor: ${mood.mood}, Data: ${mood.date}", style = MaterialTheme.typography.body1)
                     Spacer(modifier = Modifier.height(8.dp))
                 }

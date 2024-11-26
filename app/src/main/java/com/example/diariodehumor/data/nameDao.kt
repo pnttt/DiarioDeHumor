@@ -12,10 +12,14 @@ interface nameDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertName(name: Name)
 
-    @Query("SELECT name FROM name_table")
+    @Query("SELECT name FROM name_table LIMIT 1")
     fun getName(): Flow<String>
 
-    // @Query("SELECT name FROM name_table")
-    // fun getName(): Flow<String>
+    @Query("SELECT * FROM name_table")
+    suspend fun getAllNames(): List<Name>
+
+    @Query("DELETE FROM name_table")
+    suspend fun deleteAllNames()
+
 
 }
