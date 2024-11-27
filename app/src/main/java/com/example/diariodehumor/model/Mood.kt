@@ -8,5 +8,6 @@ import java.util.Date
 data class Mood(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val mood: String,
-    val date: Date
+    val date: Date,
+    val description: String
 )

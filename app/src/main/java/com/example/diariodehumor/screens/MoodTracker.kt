@@ -17,6 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -44,6 +45,8 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
 
     var isAddingMood by remember { mutableStateOf(false) }
     var selectedMood by remember { mutableStateOf("") }
+    var isDescriptionDialogVisible by remember { mutableStateOf(false) }
+    var moodDescription by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -59,19 +62,17 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            // Lista de Humores
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
                 items(moods) { mood ->
-                    Text("Humor: ${mood.mood}, Data: ${mood.date}", style = MaterialTheme.typography.body1)
+                    Text("Humor: ${mood.mood}, Data: ${mood.date}, Description: ${mood.description}", style = MaterialTheme.typography.body1)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            // BottomSheet para Adicionar Humor
             if (isAddingMood) {
                 AlertDialog(
                     onDismissRequest = { isAddingMood = false },
@@ -80,17 +81,40 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                         Column {
                             Text("Escolha o humor:")
                             Spacer(modifier = Modifier.height(16.dp))
-                            Row {
-                                Button(onClick = { selectedMood = "Feliz" }) {
+                            Column {
+                                Button(onClick = {
+                                    selectedMood = "Feliz"
+                                    isDescriptionDialogVisible = true
+                                }) {
                                     Text("😊 Feliz")
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { selectedMood = "Triste" }) {
+                                Button(onClick = {
+                                    selectedMood = "Triste"
+                                    isDescriptionDialogVisible = true
+                                }) {
                                     Text("😢 Triste")
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = { selectedMood = "Neutro" }) {
+                                Button(onClick = {
+                                    selectedMood = "Neutro"
+                                    isDescriptionDialogVisible = true
+                                }) {
                                     Text("😐 Neutro")
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(onClick = {
+                                    selectedMood = "Zangado"
+                                    isDescriptionDialogVisible = true
+                                }) {
+                                    Text("😡 Zangado")
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(onClick = {
+                                    selectedMood = "Outro"
+                                    isDescriptionDialogVisible = true
+                                }) {
+                                    Text("Outro")
                                 }
                             }
                         }
@@ -102,10 +126,12 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                                     viewModel.addMood(
                                         Mood(
                                             mood = selectedMood,
-                                            date = Date()
+                                            date = Date(),
+                                            description = moodDescription
                                         )
                                     )
                                     selectedMood = ""
+                                    moodDescription = ""
                                     isAddingMood = false
                                 }
                             }
@@ -120,6 +146,54 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                     }
                 )
             }
+
+            if (isDescriptionDialogVisible) {
+                DescriptionDialog(
+                    onDismiss = { isDescriptionDialogVisible = false },
+                    onSave = { description ->
+                        moodDescription = description
+                        isDescriptionDialogVisible = false
+                    }
+                )
+            }
         }
     }
+}
+
+@Composable
+fun DescriptionDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var description by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Adicionar descrição") },
+        text = {
+            Column {
+                Text("Escreva a descrição do seu humor:")
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Descrição") }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onSave(description)
+                }
+            ) {
+                Text("Salvar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
