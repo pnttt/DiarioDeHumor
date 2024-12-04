@@ -123,16 +123,8 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                         Button(
                             onClick = {
                                 if (selectedMood.isNotEmpty()) {
-                                    viewModel.addMood(
-                                        Mood(
-                                            mood = selectedMood,
-                                            date = Date(),
-                                            description = moodDescription
-                                        )
-                                    )
-                                    selectedMood = ""
-                                    moodDescription = ""
-                                    isAddingMood = false
+                                    isDescriptionDialogVisible = true
+
                                 }
                             }
                         ) {
@@ -153,6 +145,16 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                     onSave = { description ->
                         moodDescription = description
                         isDescriptionDialogVisible = false
+                        viewModel.addMood(
+                            Mood(
+                                mood = selectedMood,
+                                date = Date(),
+                                description = moodDescription
+                            )
+                        )
+                        selectedMood = ""
+                        moodDescription = ""
+                        isAddingMood = false
                     }
                 )
             }
