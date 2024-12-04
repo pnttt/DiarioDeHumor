@@ -1,25 +1,12 @@
 package com.example.diariodehumor.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,7 +20,7 @@ import androidx.navigation.NavHostController
 import com.example.diariodehumor.model.Mood
 import com.example.diariodehumor.viewmodel.MoodViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 @Composable
 fun MoodTrackerScreen(name: String, navController: NavHostController) {
@@ -46,6 +33,14 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
     var isDescriptionDialogVisible by remember { mutableStateOf(false) }
     var moodDescription by remember { mutableStateOf("") }
 
+    var selectedFilterMood by remember { mutableStateOf<String?>(null) }
+    var selectedFilterDate by remember { mutableStateOf<String?>(null) }
+
+    val filteredMoods = moods.filter { mood ->
+        (selectedFilterMood == null || mood.mood == selectedFilterMood) &&
+                (selectedFilterDate == null || formatDate(mood.date) == selectedFilterDate)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,6 +52,25 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
             FloatingActionButton(onClick = { isAddingMood = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Adicionar Humor")
             }
+        },
+        bottomBar = {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Filtros com a opção de limpar
+                FilterButton("Humor", moods.map { it.mood }.distinct(), onFilterSelected = { selectedFilterMood = it })
+                Spacer(modifier = Modifier.width(8.dp))
+                FilterButton("Data", moods.map { formatDate(it.date) }.distinct(), onFilterSelected = { selectedFilterDate = it })
+                Spacer(modifier = Modifier.width(8.dp))
+                // Botão de limpar filtro
+                ClearFiltersButton(
+                    onClearFilters = {
+                        selectedFilterMood = null
+                        selectedFilterDate = null
+                    }
+                )
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
@@ -65,8 +79,8 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                items(moods) { mood ->
-                    MoodItem(mood) // Função para exibir cada item de humor
+                items(filteredMoods) { mood ->
+                    MoodItem(mood)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -126,6 +140,41 @@ fun MoodTrackerScreen(name: String, navController: NavHostController) {
 }
 
 @Composable
+fun FilterButton(
+    label: String,
+    options: List<String>,
+    onFilterSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Outlined.Settings, contentDescription = "Filtrar $label")
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { option ->
+                DropdownMenuItem(onClick = {
+                    onFilterSelected(option)
+                    expanded = false
+                }) {
+                    Text(text = option)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ClearFiltersButton(onClearFilters: () -> Unit) {
+    Button(
+        onClick = onClearFilters,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Limpar Filtros")
+    }
+}
+
+@Composable
 fun MoodItem(mood: Mood) {
 
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")
@@ -175,7 +224,6 @@ fun MoodButtonList(onMoodSelected: (String) -> Unit) {
     }
 }
 
-
 @Composable
 fun DescriptionDialog(
     onDismiss: () -> Unit,
@@ -212,4 +260,9 @@ fun DescriptionDialog(
             }
         }
     )
+}
+
+fun formatDate(date: Date): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    return dateFormat.format(date)
 }
